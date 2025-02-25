@@ -3,7 +3,7 @@
 taskflow-backend/
 │── user-service/          # Handles authentication, user roles  PORT: 5001 | Uses JWT-based authentication
 │   ├── src/  
-│   │   ├── routes/  
+│   │   ├── routes/   
 │   │   ├── middlewares/  
 │   │   ├── controllers/  
 │   │   ├── models/  
