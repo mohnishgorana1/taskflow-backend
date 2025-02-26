@@ -5,9 +5,8 @@ import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-import authRoutes from "./routes/auth.routes";
 import connectDB from "./config/db";
-import userRoutes from "./routes/user.routes";
+import taskRoutes from "./routes/task.routes";
 
 dotenv.config();
 connectDB();
@@ -32,7 +31,6 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Routes
-app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/task", taskRoutes);
 
 export default app;
