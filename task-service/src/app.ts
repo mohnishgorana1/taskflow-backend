@@ -7,6 +7,8 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import connectDB from "./config/db";
 import taskRoutes from "./routes/task.routes";
+import projectRoutes from "./routes/project.routes";
+
 
 dotenv.config();
 connectDB();
@@ -32,5 +34,6 @@ app.use(limiter);
 
 // Routes
 app.use("/api/v1/task", taskRoutes);
+app.use("/api/v1/project", projectRoutes);
 
 export default app;

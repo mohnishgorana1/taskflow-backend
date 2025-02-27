@@ -1,5 +1,10 @@
 import axios from "axios";
-export const authMiddleware = async (req: any, res: any, next: any) => {
+import { AuthenticatedRequest } from "../types";
+export const authMiddleware = async (
+  req: AuthenticatedRequest,
+  res: any,
+  next: any
+) => {
   try {
     const authHeader = req.headers.authorization;
 
@@ -10,8 +15,8 @@ export const authMiddleware = async (req: any, res: any, next: any) => {
     }
     const token = authHeader.split(" ")[1];
 
-    console.log("accesstoken", token);
-    console.log(`user service url: , ${process.env.USER_SERVICE_URL}/verify`);
+    // console.log("accesstoken", token);
+    // console.log(`user service url: , ${process.env.USER_SERVICE_URL}/verify`);
 
     // Call the User Service `/verify` route
     const response = await axios.post(
@@ -19,7 +24,7 @@ export const authMiddleware = async (req: any, res: any, next: any) => {
       { token: token },
       { headers: { Authorization: `Bearer ${token}` } }
     );
-    console.log("verify response", response);
+    // console.log("verify response", response);
 
     // Attach the user to the request
     if (response.data.success) {

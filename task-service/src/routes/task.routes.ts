@@ -1,11 +1,9 @@
 import express from "express";
 import { authMiddleware } from "../middlewares/auth.middleware";
-
+import { createTask, getTasksByProject, assignUsersToTask } from "../controllers/task.controller";
 const router = express.Router();
 
-router.get("/", authMiddleware, (req: any, res: any) => {
-  console.log("getting all task", req.user);
-  return res.status(200).json({ success: true, message: "working" });
-});
-
+router.post("/:projectId/", authMiddleware, createTask);
+router.get("/:projectId/", authMiddleware, getTasksByProject)
+router.put("/:taskId/assign", authMiddleware, assignUsersToTask)
 export default router;
