@@ -407,3 +407,72 @@ export const getSingleTaskDetails = async (
     });
   }
 };
+
+export const updateTask = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { taskId } = req.params;
+    const updates = req.body;
+
+    if (!taskId) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid Task ID",
+      });
+      return;
+    }
+
+    const allowedUpdates = [
+      "title",
+      "description",
+      "priority",
+      "status",
+      "dueDate",
+      "labels",
+    ];
+    const updateFields: any = {};
+
+    // ignoring undefined fields
+    for (const key of allowedUpdates) {
+      if (updates[key] !== undefined) {
+        updateFields[key] = updates[key];
+      }
+    }
+
+    if (Object.keys(updateFields).length === 0) {
+      res.status(400).json({
+        success: false,
+        message: "No valid fields provided for update",
+      });
+      return;
+    }
+
+    // Update only the provided fields, keeping existing values for others
+    const updatedTask = await Task.findByIdAndUpdate(
+      taskId,
+      { $set: updateFields },
+      { new: true } // Returns updated document
+    );
+
+    if (!updatedTask) {
+      res.status(404).json({
+        success: false,
+        message: "Task not found",
+      });
+      return;
+    }
+    res.status(200).json({
+      success: true,
+      message: "Task updated successfully",
+      task: updatedTask,
+    });
+    return;
+  } catch (error) {
+    console.error("ERROR:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error instanceof Error ? error.message : error,
+    });
+    return;
+  }
+};

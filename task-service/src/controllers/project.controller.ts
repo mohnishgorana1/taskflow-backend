@@ -157,28 +157,6 @@ export const getProjectDetailsById = async (req: any, res: any) => {
   }
 };
 
-export const updateProject = async (req: any, res: any) => {
-  try {
-  } catch (error) {
-    console.log("ERROR", error);
-    return res.status(500).json({
-      success: false,
-      message: "",
-    });
-  }
-};
-
-export const deleteProject = async (req: any, res: any) => {
-  try {
-  } catch (error) {
-    console.log("ERROR", error);
-    return res.status(500).json({
-      success: false,
-      message: "",
-    });
-  }
-};
-
 export const addTeamMembers = async (req: any, res: any) => {
   const { projectId } = req.params;
   const userId = req.user?._id;
@@ -255,6 +233,33 @@ export const addTeamMembers = async (req: any, res: any) => {
       success: false,
       message: "Internal Server Error",
       error: error,
+    });
+  }
+};
+
+
+// TODO
+export const updateProject = async (req: any, res: any) => {
+  try {
+  } catch (error) {
+    console.log("ERROR update project", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+};
+
+// TODO
+export const deleteProject = async (req: any, res: any) => {
+  try {
+  } catch (error) {
+    console.log("ERROR delete project", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error instanceof Error ? error.message : error,
     });
   }
 };
