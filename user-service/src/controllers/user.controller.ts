@@ -31,23 +31,26 @@ export const verifyUser = async (req: any, res: any) => {
   }
 };
 
-export const getUserDetailsByEmail = async (req: any, res: any) => {
-  const { email } = req.params;
-  console.log("Requesting user details for email", email);
+export const getUserDetailsByEmails = async (req: any, res: any) => {
+  const { emails } = req.body;
+  console.log("Requesting user details for email", emails);
 
-  if (!email) {
-    return res.status(401).json({ success: false, message: "Missing Email" });
+  if (!emails) {
+    return res.status(401).json({ success: false, message: "Missing Emails" });
   }
 
-  const user = await User.findOne({ email });
-  if (!user) {
-    return res.status(401).json({ success: false, message: "User not found" });
+  // const user = await User.findOne({ email });
+  const users = await User.find({ email: { $in: emails } }).select(
+    "_id name email profilePicture"
+  );
+  if (!users) {
+    return res.status(401).json({ success: false, message: "Users not found" });
   }
 
   return res.status(201).json({
     success: true,
-    message: "User Details Fetched SuccessFully",
-    user,
+    message: "Users Details Fetched SuccessFully",
+    users,
   });
 };
 
@@ -64,6 +67,6 @@ export const fetchUsers = async (req: any, res: any) => {
     "_id name email profilePicture"
   );
   console.log("fetched USers", users);
-  
+
   return res.status(201).json({ success: true, users });
 };

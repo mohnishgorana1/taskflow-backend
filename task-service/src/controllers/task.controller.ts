@@ -1,5 +1,7 @@
 import Project from "../models/project.model";
 import Task from "../models/task.model";
+import Comment from "../models/comment.model";
+
 import { Response } from "express";
 import { AuthenticatedRequest } from "../types";
 import mongoose from "mongoose";
@@ -222,9 +224,9 @@ export const assignUsersToTask = async (
     }
 
     // Call the User Service GET `/` route for fteching user details form that email
-    const response = await axios.get(
-      `${process.env.USER_SERVICE_URL}/${email}`
-    );
+    const response = await axios.post(`${process.env.USER_SERVICE_URL}`, {
+      emails: [email],
+    });
     if (!response.data.success) {
       res.status(400).json({
         success: false,
@@ -233,7 +235,7 @@ export const assignUsersToTask = async (
       return;
     }
 
-    const userData = response.data.user;
+    const userData = response.data.users[0];
 
     const isUserAlreadyAsssigned = task.assignedTo.includes(userData._id);
     if (isUserAlreadyAsssigned) {
@@ -271,6 +273,133 @@ export const assignUsersToTask = async (
     });
   } catch (error) {
     console.log("ERROR in Fetching Tasks: ", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+};
+
+export const commentTask = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  const { comment } = req.body;
+  const userId = req.user?._id;
+  const { taskId } = req.params;
+
+  console.log("req data for comment", comment, taskId, userId);
+
+  if (!userId) {
+    res.status(401).json({
+      success: false,
+      message: "Unauthorized: User not found",
+    });
+    return;
+  }
+  if (!comment) {
+    res.status(400).json({
+      success: false,
+      message: "Missing Comment Data in request",
+    });
+    return;
+  }
+  if (!taskId) {
+    res.status(400).json({
+      success: false,
+      message: "Missing TaskId in params",
+    });
+    return;
+  }
+
+  try {
+    // find  task
+    const task = await Task.findById(taskId);
+    if (!task) {
+      res.status(404).json({
+        success: false,
+        message: "Task not found for commenting",
+      });
+      return;
+    }
+
+    const newComment: any = await Comment.create({
+      taskId,
+      userId,
+      message: comment,
+    });
+    if (!newComment) {
+      res.status(404).json({
+        success: false,
+        message: "Comment not created in DB",
+      });
+      return;
+    }
+    console.log("new comment", newComment);
+
+    // update task having this comment
+    task?.comments?.push(newComment._id);
+    await task.save();
+
+    res.status(201).json({
+      success: true,
+      message: "Comment Added to Task Successfully",
+      comment: newComment,
+    });
+  } catch (error) {
+    console.log("ERROR in adding new Comment: ", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+};
+
+export const getSingleTaskDetails = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  const userId = req.user?._id;
+  const { taskId } = req.params;
+
+  console.log("req data for getting task details", taskId, userId);
+
+  if (!userId) {
+    res.status(401).json({
+      success: false,
+      message: "Unauthorized: User not found",
+    });
+    return;
+  }
+
+  if (!taskId) {
+    res.status(400).json({
+      success: false,
+      message: "Missing TaskId in params",
+    });
+    return;
+  }
+
+  try {
+    // find  task details
+    const task = await Task.findById(taskId).populate("comments");
+    if (!task) {
+      res.status(404).json({
+        success: false,
+        message: "Task not found",
+      });
+      return;
+    }
+
+    res.status(201).json({
+      success: true,
+      message: "Task details fetched Successfully",
+      task: task,
+    });
+  } catch (error) {
+    console.log("ERROR in fetching task details: ", error);
     res.status(500).json({
       success: false,
       message: "Internal Server Error",

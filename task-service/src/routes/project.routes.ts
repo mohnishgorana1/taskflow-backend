@@ -11,11 +11,11 @@ import { authMiddleware } from "../middlewares/auth.middleware";
 
 const router = express.Router();
 
-router.post("/", authMiddleware, createProject);
-router.get("/", authMiddleware, getProjects);
-router.get("/:id", authMiddleware, getProjectDetailsById);
-router.patch("/:id", authMiddleware, updateProject);
-router.delete("/:id", authMiddleware, deleteProject);
-router.patch("/:id/team", authMiddleware, addTeamMembers);
+router.post("/", authMiddleware, createProject); // done
+router.get("/", authMiddleware, getProjects);  
+router.get("/:projectId", authMiddleware, getProjectDetailsById); // done
+router.patch("/:projectId", authMiddleware, updateProject);
+router.delete("/:projectId", authMiddleware, deleteProject);
+router.patch("/:projectId/team", authMiddleware, addTeamMembers);  // done
 
 export default router;
