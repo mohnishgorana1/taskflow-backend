@@ -237,6 +237,106 @@ export const addTeamMembers = async (req: any, res: any) => {
   }
 };
 
+export const getMyProjects = async (req: any, res: any) => {
+  try {
+    const userId = req.user._id;
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized!, Can't get your details",
+      });
+    }
+
+    //* Basic Approach
+    // const projectsAsAdmin = await Project.find({ projectAdmin: userId });
+    // const projectsAsTeamMemer = await Project.find({
+    //   teamMembers: userId,
+    //   projectAdmin: { $ne: userId },
+    // });
+
+    //* Optimised Approach
+    const projects = await Project.find({
+      $or: [{ projectAdmin: userId }, { teamMembers: userId }],
+    });
+    const segregatedProjects = {
+      asAdmin: projects.filter(
+        (p) => String(p.projectAdmin) === String(userId)
+      ),
+      asTeamMember: projects.filter(
+        (p) => String(p.projectAdmin) !== String(userId)
+      ),
+    };
+    return res.status(201).json({
+      success: true,
+      message: "Projects fetched successfully",
+      projects: segregatedProjects,
+    });
+  } catch (error) {
+    console.log("ERROR", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+export const leaveProject = async (req: any, res: any) => {
+  // leave project by team member
+  try {
+    const { projectId } = req.params;
+    const userId = req?.user._id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized!, Can't get your details",
+      });
+    }
+    if (!projectId) {
+      return res.status(401).json({
+        success: false,
+        message: "Can't get your project Id",
+      });
+    }
+
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(401).json({
+        success: false,
+        message: "Can't find project!",
+      });
+    }
+
+    if (String(project.projectAdmin) === String(userId)) {
+      return res.status(500).json({
+        success: false,
+        message:
+          "Project Admin can't just leave the project. Transfer admin rights first.",
+      });
+    }
+    if (!project.teamMembers?.includes(userId)) {
+      return res.status(500).json({
+        success: false,
+        message: "You are not a member of this project",
+      });
+    }
+
+    project.teamMembers = project.teamMembers.filter(
+      (member) => String(member) !== String(userId)
+    );
+    await project.save();
+    return res.status(200).json({
+      success: true,
+      message: "Successfully left the project",
+    });
+  } catch (error) {
+    console.log("ERROR delete project", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+};
 
 // TODO
 export const updateProject = async (req: any, res: any) => {
