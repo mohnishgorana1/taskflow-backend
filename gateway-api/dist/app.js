@@ -35,8 +35,8 @@ const forwardAuthHeaders = (req, res, next) => {
     next();
 };
 // Proxy configuration
-const userServiceUrl = process.env.USER_SERVICE_URL || "http://localhost:5001";
-const taskServiceUrl = process.env.TASK_SERVICE_URL || "http://localhost:5002";
+const userServiceUrl = process.env.USER_SERVICE_URL || "https://taskflow-gwps.onrender.com";
+const taskServiceUrl = process.env.TASK_SERVICE_URL || "https://taskflow-task-service.onrender.com";
 // Proxy requests to User Service for authentication and user-related endpoints
 app.use("/api/v1/auth", forwardAuthHeaders, (0, express_http_proxy_1.default)(userServiceUrl, {
     proxyReqPathResolver: (req) => `/api/v1/auth${req.url}`,
