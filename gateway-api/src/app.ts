@@ -44,7 +44,7 @@ const taskServiceUrl = process.env.TASK_SERVICE_URL || "https://taskflow-task-se
 app.use(
   "/api/v1/auth",
   forwardAuthHeaders,
-  expressProxy(userServiceUrl, {
+  expressProxy(userServiceUrl, {s
     proxyReqPathResolver: (req: any) => `/api/v1/auth${req.url}`,
   })
 );
