@@ -37,7 +37,7 @@ const forwardAuthHeaders = (req: any, res: any, next: any) => {
   next();
 };
 // Proxy configuration
-const userServiceUrl = process.env.USER_SERVICE_URL || "http://localhost:5001";
+const userServiceUrl = process.env.USER_SERVICE_URL || "https://taskflow-backend-7hz1.onrender.com";
 const taskServiceUrl = process.env.TASK_SERVICE_URL || "http://localhost:5002";
 
 // Proxy requests to User Service for authentication and user-related endpoints
